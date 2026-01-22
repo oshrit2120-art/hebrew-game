@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק לימוד עברית</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffeef8 0%, #e0f4ff 50%, #f0e6ff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 10px;
+        }
+
+        /* Floating decorations */
+        .decoration {
+            position: fixed;
+            opacity: 0.3;
+            animation: float 6s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .cloud { font-size: 40px; }
+        .heart { font-size: 30px; color: #ffb6d9; }
+        .star { font-size: 25px; color: #ffd700; }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(255, 182, 217, 0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        h1 {
+            color: #ff1493;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            text-shadow: 2px 2px 4px rgba(255, 182, 217, 0.3);
+            font-weight: bold;
+        }
+
+        h2 {
+            color: #ff69b4;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 600px) {
+            body {
+                padding: 5px;
+            }
+            
+            .container {
+                padding: 15px;
+                border-radius: 15px;
+                max-height: 98vh;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+                margin-bottom: 10px;
+            }
+            
+            h2 {
+                font-size: 1.2em;
+                margin-bottom: 10px;
+            }
+            
+            .cloud { font-size: 30px; }
+            .heart { font-size: 20px; }
+            .star { font-size: 18px; }
+            
+            .user-list {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 10px;
+                margin: 15px 0;
+            }
+            
+            .user-card {
+                padding: 15px 10px;
+                border-radius: 12px;
+                border: 2px solid #ffd6e8;
+            }
+            
+            .user-card h3 {
+                font-size: 1.1em;
+                margin-bottom: 5px;
+            }
+            
+            .user-card p {
+                font-size: 1em;
+            }
+            
+            .user-input {
+                margin: 15px 0;
+            }
+            
+            input {
+                padding: 10px 15px;
+                font-size: 1em;
+                width: 90%;
+                max-width: 250px;
+                border: 2px solid #ff69b4;
+                border-radius: 12px;
+            }
+            
+            button {
+                padding: 12px 25px;
+                font-size: 1em;
+                border-radius: 15px;
+                margin: 8px;
+            }
+            
+            .category-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 12px;
+                margin: 15px 0;
+            }
+            
+            .category-btn {
+                padding: 20px 15px;
+                border: 3px solid #ff69b4;
+                border-radius: 15px;
+            }
+            
+            .category-btn .cat-title {
+                font-size: 1.3em;
+            }
+            
+            .category-btn.completed::after {
+                top: 8px;
+                right: 8px;
+                font-size: 1.5em;
+            }
+            
+            .activity-menu {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                margin: 15px 0;
+            }
+            
+            .activity-btn {
+                padding: 18px 15px;
+                font-size: 1.1em;
+                border: 3px solid #ff69b4;
+                border-radius: 15px;
+            }
+            
+            .game-area {
+                margin: 15px 0;
+            }
+            
+            .image-container {
+                width: 200px;
+                height: 200px;
+                margin: 0 auto 15px;
+                border: 4px solid #ff69b4;
+            }
+            
+            .word-display {
+                font-size: 2em;
+                margin: 15px 0;
+            }
+            
+            .options {
+                gap: 10px;
+                margin: 15px 0;
+            }
+            
+            .option-btn {
+                padding: 15px;
+                font-size: 1.3em;
+                border: 3px solid #ff69b4;
+                border-radius: 12px;
+            }
+            
+            .user-info {
+                font-size: 1.1em;
+                margin: 12px 0;
+                padding: 10px;
+                border-radius: 15px;
+                border: 2px solid #ffb6d9;
+            }
+            
+            .progress-text {
+                font-size: 1em;
+                margin: 12px 0;
+            }
+            
+            .back-btn {
+                padding: 8px 15px;
+                font-size: 0.9em;
+                border-radius: 10px;
+                margin: 5px;
+            }
+            
+            .nikud-prompt {
+                padding: 15px;
+                border-radius: 20px;
+                margin-bottom: 15px;
+                border: 3px solid #ffd700;
+            }
+            
+            .sound-circle {
+                width: 100px;
+                height: 100px;
+                border: 3px solid #fff;
+            }
+            
+            .sound-icon {
+                font-size: 2.5em;
+                margin-bottom: 3px;
+            }
+            
+            .sound-text {
+                font-size: 0.75em;
+            }
+            
+            .nikud-options-grid {
+                gap: 12px;
+                margin: 15px 0;
+                max-width: 100%;
+            }
+            
+            .option-btn.nikud-lesson {
+                padding: 15px 10px;
+                gap: 8px;
+                min-height: 100px;
+                border: 3px solid #85d4ff;
+            }
+            
+            .nikud-name {
+                font-size: 0.9em;
+            }
+            
+            .nikud-example {
+                font-size: 2.5em;
+            }
+            
+            .letters-container {
+                gap: 8px;
+                margin: 15px 0;
+            }
+            
+            .letter-box {
+                width: 60px;
+                height: 60px;
+                border: 3px dashed #ff69b4;
+                border-radius: 10px;
+                font-size: 1.8em;
+            }
+            
+            .draggable-letters {
+                gap: 8px;
+                margin: 15px 0;
+            }
+            
+            .letter-btn {
+                width: 55px;
+                height: 55px;
+                font-size: 1.6em;
+                border: 3px solid #ff69b4;
+                border-radius: 10px;
+            }
+            
+            .sound-btn {
+                width: 80px;
+                height: 80px;
+                font-size: 2em;
+                border-radius: 50%;
+                border: 3px solid #ff69b4;
+                margin: 10px auto;
+            }
+        }
+
+        .user-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .user-card {
+            background: linear-gradient(135deg, #fff9fc 0%, #ffe4f0 100%);
+            padding: 30px 20px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 4px solid #ffd6e8;
+            box-shadow: 0 5px 15px rgba(255, 182, 193, 0.2);
+        }
+
+        .user-card:hover {
+            transform: translateY(-10px) rotate(2deg);
+            box-shadow: 0 15px 35px rgba(255, 182, 193, 0.4);
+            border-color: #ff69b4;
+        }
+
+        .user-card h3 {
+            font-size: 1.5em;
+            color: #ff1493;
+            margin-bottom: 10px;
+        }
+
+        .user-card p {
+            font-size: 1.2em;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .user-input {
+            margin: 30px 0;
+        }
+
+        input {
+            padding: 15px 25px;
+            font-size: 1.3em;
+            border: 3px solid #ff69b4;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            transition: all 0.3s;
+            color: #333;
+            font-weight: bold;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #ff1493;
+            transform: scale(1.05);
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff1493, #ff69b4);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.5);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .category-btn {
+            padding: 40px 25px;
+            background: white;
+            border: 4px solid #ff69b4;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.2);
+        }
+
+        .category-btn:hover {
+            transform: scale(1.05);
+            border-color: #ff1493;
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.3);
+        }
+
+        .category-btn .cat-title {
+            font-size: 1.8em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .category-btn.completed::after {
+            content: '✓';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #4CAF50;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .activity-menu {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .activity-btn {
+            padding: 30px 25px;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+            background: linear-gradient(135deg, #ffffff, #ffeef8);
+            border: 4px solid #ff69b4;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.2);
+        }
+
+        .activity-btn:hover {
+            transform: scale(1.05);
+            border-color: #ff1493;
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.3);
+        }
+
+        .game-area {
+            margin: 30px 0;
+        }
+
+        .image-container {
+            width: 350px;
+            height: 350px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 6px solid #ff69b4;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .word-display {
+            font-size: 3.5em;
+            color: #ff1493;
+            margin: 30px 0;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(255, 182, 217, 0.3);
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .option-btn {
+            padding: 25px;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+            background: white;
+            border: 4px solid #ff69b4;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(255, 105, 180, 0.2);
+        }
+
+        .option-btn:hover {
+            background: #fff0f8;
+            transform: scale(1.05);
+            border-color: #ff1493;
+        }
+
+        .option-btn.correct {
+            background: #c8e6c9;
+            border-color: #4CAF50;
+            color: #2e7d32;
+            animation: bounce 0.5s;
+        }
+
+        .option-btn.wrong {
+            background: #ffcdd2;
+            border-color: #f44336;
+            color: #c62828;
+            animation: shake 0.5s;
+        }
+
+        .option-btn.nikud-lesson {
+            background: linear-gradient(135deg, #e7f3ff, #b3d4ff);
+            border-color: #85d4ff;
+            color: #333;
+            padding: 25px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            min-height: 140px;
+        }
+
+        .option-btn.nikud-lesson:hover {
+            background: linear-gradient(135deg, #d4e9ff, #a0c8ff);
+            border-color: #5eb8ff;
+        }
+
+        .nikud-name {
+            font-size: 1.1em;
+            margin: 0;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .nikud-example {
+            font-size: 3.5em;
+            color: #333;
+            font-weight: bold;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .nikud-prompt {
+            background: linear-gradient(135deg, #fff9e6, #ffe4b3);
+            padding: 30px;
+            border-radius: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 4px solid #ffd700;
+        }
+
+        .sound-circle {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+            border: 5px solid #fff;
+        }
+
+        .sound-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .sound-icon {
+            font-size: 3.5em;
+            margin-bottom: 5px;
+        }
+
+        .sound-text {
+            font-size: 0.9em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .nikud-options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .letters-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .letter-box {
+            width: 90px;
+            height: 90px;
+            border: 4px dashed #ff69b4;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+            background: white;
+        }
+
+        .letter-box.filled {
+            background: #fff0f8;
+            border-style: solid;
+            border-color: #ff1493;
+        }
+
+        .draggable-letters {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .letter-btn {
+            width: 80px;
+            height: 80px;
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #333;
+            background: linear-gradient(135deg, #ffffff, #ffeef8);
+            border: 4px solid #ff69b4;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(255, 105, 180, 0.2);
+        }
+
+        .letter-btn:hover {
+            transform: scale(1.1);
+            border-color: #ff1493;
+        }
+
+        .letter-btn.used {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ffd700;
+            animation: confetti-fall 3s linear;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes confetti-fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .bunny {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 100px;
+            animation: bunny-jump 1s ease-in-out;
+            z-index: 1000;
+        }
+
+        @keyframes bunny-jump {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-40px); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress-text {
+            color: #333;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .user-info {
+            text-align: center;
+            font-size: 1.4em;
+            margin: 20px 0;
+            color: #ff1493;
+            background: linear-gradient(135deg, #ffeef8 0%, #e7f3ff 100%);
+            padding: 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            border: 3px solid #ffb6d9;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #87ceeb, #b4d4ff);
+            margin-top: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .sound-btn {
+            font-size: 5em;
+            background: linear-gradient(135deg, #ffd700, #ffeb3b);
+            border: 5px solid #ff8c00;
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .sound-btn:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating decorations -->
+    <div class="decoration cloud" style="top: 10%; left: 10%;">☁️</div>
+    <div class="decoration cloud" style="top: 20%; right: 15%;">☁️</div>
+    <div class="decoration heart" style="top: 60%; left: 5%;">💗</div>
+    <div class="decoration heart" style="top: 70%; right: 10%;">💖</div>
+    <div class="decoration star" style="top: 15%; left: 80%;">⭐</div>
+    <div class="decoration star" style="top: 80%; left: 20%;">✨</div>
+
+    <div class="container">
+        <!-- User Selection Screen -->
+        <div id="userScreen">
+            <h1>🌈 ברוכים הבאים למשחק העברית! 🌈</h1>
+            <h2>בחרו משתמש ✨</h2>
+            <div class="user-input">
+                <input type="text" id="userName" placeholder="✏️ שם משתמש חדש" maxlength="20">
+                <br><br>
+                <button onclick="createUser()">🌟 יצירת משתמש</button>
+            </div>
+            <div id="userList" class="user-list"></div>
+        </div>
+
+        <!-- Category Selection Screen -->
+        <div id="categoryScreen" class="hidden">
+            <button class="back-btn" onclick="backToUserSelect()">← חזרה למשתמשים</button>
+            <h1>שלום <span id="displayName"></span>! 👋</h1>
+            <p class="progress-text">בחרו קטגוריה ללימוד:</p>
+            <div class="user-info">⭐ ניקוד: <span id="userScore">0</span></div>
+            <div class="category-grid">
+                <div class="category-btn" onclick="selectCategory('animals')">
+                    <div class="cat-title">🐾 חיות</div>
+                </div>
+                <div class="category-btn" onclick="selectCategory('fruits')">
+                    <div class="cat-title">🍎 פירות</div>
+                </div>
+                <div class="category-btn" onclick="selectCategory('vegetables')">
+                    <div class="cat-title">🥕 ירקות</div>
+                </div>
+                <div class="category-btn" onclick="selectCategory('clothes')">
+                    <div class="cat-title">👕 בגדים</div>
+                </div>
+                <div class="category-btn" onclick="selectCategory('transport')">
+                    <div class="cat-title">🚗 תחבורה</div>
+                </div>
+                <div class="category-btn" onclick="selectCategory('objects')">
+                    <div class="cat-title">🎈 עצמים</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Menu Screen -->
+        <div id="activityScreen" class="hidden">
+            <h1 id="categoryTitle"></h1>
+            <div class="activity-menu">
+                <button class="activity-btn" onclick="startActivity(1)">
+                    🖼️ התאמת מילה לתמונה
+                </button>
+                <button class="activity-btn" onclick="startActivity(2)">
+                    🎯 בחירת ניקוד נכון
+                </button>
+                <button class="activity-btn" onclick="startActivity(3)">
+                    🔤 הרכבת מילים
+                </button>
+                <button class="activity-btn" onclick="startActivity(4)">
+                    📖 תרגול קריאה
+                </button>
+                <button class="activity-btn" onclick="startActivity(5)">
+                    🎵 לימוד ניקוד
+                </button>
+            </div>
+            <button class="back-btn" onclick="backToCategories()">חזרה לקטגוריות</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="hidden">
+            <h1 id="gameTitle"></h1>
+            <p class="progress-text" id="progressText"></p>
+            <div class="game-area" id="gameArea"></div>
+            <button class="back-btn" onclick="backToActivities()">חזרה לפעילויות</button>
+        </div>
+
+        <!-- Activity 5: Nikud Learning Screen -->
+        <div id="activity5" class="hidden">
+            <button class="back-btn" onclick="backToActivities()">חזרה לפעילויות</button>
+            <h1>🎵 לימוד ניקוד</h1>
+            <div class="nikud-prompt">
+                <div class="sound-circle" onclick="playCurrentNikudLesson()">
+                    <div class="sound-icon">🔊</div>
+                    <div class="sound-text">שמעו שוב</div>
+                </div>
+            </div>
+            <div class="nikud-options-grid" id="nikudLessonOptions"></div>
+        </div>
+    </div>
+
+    <script>
+        const nikudData = [
+            // אות ב
+            {name: 'קָמַץ', example: 'בָּ', audio: 'ba-kamatz.mp3'},
+            {name: 'פַּתַח', example: 'בַּ', audio: 'ba-patach.mp3'},
+            {name: 'חִירִיק', example: 'בִּ', audio: 'bi-chirik.mp3'},
+            {name: 'סֶגּוֹל', example: 'בֶּ', audio: 'be-segol.mp3'},
+            // אות ג
+            {name: 'קָמַץ', example: 'גָּ', audio: 'ga-kamatz.mp3'},
+            {name: 'פַּתַח', example: 'גַּ', audio: 'ga-patach.mp3'},
+            {name: 'חִירִיק', example: 'גִּ', audio: 'gi-chirik.mp3'},
+            {name: 'סֶגּוֹל', example: 'גֶּ', audio: 'ge-segol.mp3'},
+            // אות ד
+            {name: 'קָמַץ', example: 'דָּ', audio: 'da-kamatz.mp3'},
+            {name: 'פַּתַח', example: 'דַּ', audio: 'da-patach.mp3'},
+            {name: 'חִירִיק', example: 'דִּ', audio: 'di-chirik.mp3'},
+            {name: 'סֶגּוֹל', example: 'דֶּ', audio: 'de-segol.mp3'},
+            // אות כ
+            {name: 'קָמַץ', example: 'כָּ', audio: 'ka-kamatz.mp3'},
+            {name: 'פַּתַח', example: 'כַּ', audio: 'ka-patach.mp3'},
+            {name: 'חִירִיק', example: 'כִּ', audio: 'ki-chirik.mp3'},
+            {name: 'סֶגּוֹל', example: 'כֶּ', audio: 'ke-segol.mp3'},
+            // אות ל
+            {name: 'קָמַץ', example: 'לָ', audio: 'la-kamatz.mp3'},
+            {name: 'פַּתַח', example: 'לַ', audio: 'la-patach.mp3'},
+            {name: 'חִירִיק', example: 'לִ', audio: 'li-chirik.mp3'},
+            {name: 'סֶגּוֹל', example: 'לֶ', audio: 'le-segol.mp3'},
+            // אות מ
+            {name: 'קָמַץ', example: 'מָ', audio: 'ma-kamatz.mp3'},
+            {name: 'פַּתַח', example: 'מַ', audio: 'ma-patach.mp3'},
+            {name: 'חִירִיק', example: 'מִ', audio: 'mi-chirik.mp3'},
+            {name: 'סֶגּוֹל', example: 'מֶ', audio: 'me-segol.mp3'},
+            // אות נ
+            {name: 'קָמַץ', example: 'נָ', audio: 'na-kamatz.mp3'},
+            {name: 'פַּתַח', example: 'נַ', audio: 'na-patach.mp3'},
+            {name: 'חִירִיק', example: 'נִ', audio: 'ni-chirik.mp3'},
+            {name: 'סֶגּוֹל', example: 'נֶ', audio: 'ne-segol.mp3'},
+            // אות ס
+            {name: 'קָמַץ', example: 'סָ', audio: 'sa-kamatz.mp3'},
+            {name: 'פַּתַח', example: 'סַ', audio: 'sa-patach.mp3'},
+            {name: 'חִירִיק', example: 'סִ', audio: 'si-chirik.mp3'},
+            {name: 'סֶגּוֹל', example: 'סֶ', audio: 'se-segol.mp3'},
+            // אות פ
+            {name: 'קָמַץ', example: 'פָּ', audio: 'pa-kamatz.mp3'},
+            {name: 'פַּתַח', example: 'פַּ', audio: 'pa-patach.mp3'},
+            {name: 'חִירִיק', example: 'פִּ', audio: 'pi-chirik.mp3'},
+            {name: 'סֶגּוֹל', example: 'פֶּ', audio: 'pe-segol.mp3'},
+            // אות ר
+            {name: 'קָמַץ', example: 'רָ', audio: 'ra-kamatz.mp3'},
+            {name: 'פַּתַח', example: 'רַ', audio: 'ra-patach.mp3'},
+            {name: 'חִירִיק', example: 'רִ', audio: 'ri-chirik.mp3'},
+            {name: 'סֶגּוֹל', example: 'רֶ', audio: 're-segol.mp3'},
+            // אות ש
+            {name: 'קָמַץ', example: 'שָׁ', audio: 'sha-kamatz.mp3'},
+            {name: 'פַּתַח', example: 'שַׁ', audio: 'sha-patach.mp3'},
+            {name: 'חִירִיק', example: 'שִׁ', audio: 'shi-chirik.mp3'},
+            {name: 'סֶגּוֹל', example: 'שֶׁ', audio: 'she-segol.mp3'},
+            // אות ת
+            {name: 'קָמַץ', example: 'תָּ', audio: 'ta-kamatz.mp3'},
+            {name: 'פַּתַח', example: 'תַּ', audio: 'ta-patach.mp3'},
+            {name: 'חִירִיק', example: 'תִּ', audio: 'ti-chirik.mp3'},
+            {name: 'סֶגּוֹל', example: 'תֶּ', audio: 'te-segol.mp3'}
+        ];
+
+        const feedbackAudio = ['kol-hakavod.mp3', 'yofi.mp3', 'meulay.mp3', 'nehedar.mp3'];
+        const feedbackText = ['כל הכבוד!', 'יופי!', 'מעולה!', 'נהדר!'];
+
+        const wordDatabase = {
+            animals: [
+                {word: 'כֶּלֶב', plain: 'כלב', img: '🐕', audio: 'kelev.mp3'},
+                {word: 'חָתוּל', plain: 'חתול', img: '🐈', audio: 'chatul.mp3'},
+                {word: 'צִפּוֹר', plain: 'צפור', img: '🐦', audio: 'tzipor.mp3'},
+                {word: 'פִּיל', plain: 'פיל', img: '🐘', audio: 'pil.mp3'},
+                {word: 'דָּג', plain: 'דג', img: '🐟', audio: 'dag.mp3'},
+                {word: 'סוּס', plain: 'סוס', img: '🐴', audio: 'sus.mp3'}
+            ],
+            fruits: [
+                {word: 'תַּפּוּחַ', plain: 'תפוח', img: '🍎', audio: 'tapuach.mp3'}
+            ],
+            vegetables: [
+                {word: 'גֶּזֶר', plain: 'גזר', img: '🥕', audio: 'gezer.mp3'}
+            ],
+            clothes: [
+                {word: 'חֻלְצָה', plain: 'חולצה', img: '👕', audio: 'chultza.mp3'}
+            ],
+            transport: [
+                {word: 'מְכוֹנִית', plain: 'מכונית', img: '🚗', audio: 'mechonit.mp3'}
+            ],
+            objects: [
+                {word: 'בַּלּוֹן', plain: 'בלון', img: '🎈', audio: 'balon.mp3'}
+            ]
+        };
+
+        let users = JSON.parse(localStorage.getItem('hebrewGameUsers') || '[]');
+        let currentUser = null;
+        let userData = {
+            name: '',
+            currentCategory: '',
+            progress: {},
+            roundIndex: 0,
+            currentRound: []
+        };
+
+        function createUser() {
+            const name = document.getElementById('userName').value.trim();
+            if (name === '') {
+                alert('בבקשה להזין שם!');
+                return;
+            }
+            if (users.find(u => u.name === name)) {
+                alert('המשתמש כבר קיים!');
+                return;
+            }
+            users.push({name: name, score: 0, progress: {}});
+            localStorage.setItem('hebrewGameUsers', JSON.stringify(users));
+            loadUserList();
+            document.getElementById('userName').value = '';
+        }
+
+        function loadUserList() {
+            const list = document.getElementById('userList');
+            list.innerHTML = '';
+            users.forEach(user => {
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                card.innerHTML = `<h3>${user.name}</h3><p>⭐ ${user.score}</p>`;
+                card.onclick = () => selectUser(user);
+                list.appendChild(card);
+            });
+        }
+
+        function selectUser(user) {
+            currentUser = user;
+            userData.name = user.name;
+            score = user.score || 0;
+            document.getElementById('displayName').textContent = user.name;
+            document.getElementById('userScore').textContent = score;
+            document.getElementById('userScreen').classList.add('hidden');
+            document.getElementById('categoryScreen').classList.remove('hidden');
+        }
+
+        function backToUserSelect() {
+            document.getElementById('categoryScreen').classList.add('hidden');
+            document.getElementById('userScreen').classList.remove('hidden');
+            currentUser = null;
+        }
+
+        function selectCategory(category) {
+            userData.currentCategory = category;
+            userData.roundIndex = 0;
+            userData.currentRound = shuffleArray([...wordDatabase[category]]);
+            
+            const titles = {
+                animals: '🐾 חיות',
+                fruits: '🍎 פירות',
+                vegetables: '🥕 ירקות',
+                clothes: '👕 בגדים',
+                transport: '🚗 תחבורה',
+                objects: '🎈 עצמים'
+            };
+            
+            document.getElementById('categoryTitle').textContent = titles[category];
+            document.getElementById('categoryScreen').classList.add('hidden');
+            document.getElementById('activityScreen').classList.remove('hidden');
+        }
+
+        function backToCategories() {
+            document.getElementById('activityScreen').classList.add('hidden');
+            document.getElementById('categoryScreen').classList.remove('hidden');
+        }
+
+        function backToActivities() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('activity5').classList.add('hidden');
+            document.getElementById('activityScreen').classList.remove('hidden');
+        }
+
+        function startActivity(activityNum) {
+            const titles = [
+                '',
+                '🖼️ התאמת מילה לתמונה',
+                '🎯 בחירת ניקוד נכון',
+                '🔤 הרכבת מילים',
+                '📖 תרגול קריאה',
+                '🎵 לימוד ניקוד'
+            ];
+            
+            // Reset round for each activity
+            userData.roundIndex = 0;
+            userData.currentRound = shuffleArray([...wordDatabase[userData.currentCategory]]);
+            
+            if (activityNum === 5) {
+                document.getElementById('activityScreen').classList.add('hidden');
+                document.getElementById('activity5').classList.remove('hidden');
+                startActivity5();
+            } else {
+                document.getElementById('gameTitle').textContent = titles[activityNum];
+                document.getElementById('activityScreen').classList.add('hidden');
+                document.getElementById('gameScreen').classList.remove('hidden');
+                
+                if (activityNum === 1) startActivity1();
+                else if (activityNum === 2) startActivity2();
+                else if (activityNum === 3) startActivity3();
+                else if (activityNum === 4) startActivity4();
+            }
+        }
+
+        function getNextWord() {
+            if (userData.roundIndex >= userData.currentRound.length) {
+                userData.roundIndex = 0;
+                userData.currentRound = shuffleArray([...wordDatabase[userData.currentCategory]]);
+            }
+            return userData.currentRound[userData.roundIndex++];
+        }
+
+        function startActivity1() {
+            const gameArea = document.getElementById('gameArea');
+            const currentWord = getNextWord();
+            
+            updateProgress();
+            
+            const wrongWords = getRandomWords(userData.currentCategory, 3, currentWord.word);
+            const allOptions = shuffleArray([currentWord, ...wrongWords]);
+            
+            gameArea.innerHTML = `
+                <div class="image-container" style="font-size: 8em;">
+                    ${currentWord.img}
+                </div>
+                <div class="options">
+                    ${allOptions.map(w => `
+                        <button class="option-btn" onclick="checkAnswer1('${w.word}', '${currentWord.word}', '${currentWord.audio}')">
+                            ${w.word}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function checkAnswer1(selected, correct, audioFile) {
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            if (selected === correct) {
+                buttons.forEach(btn => btn.disabled = true);
+                event.target.classList.add('correct');
+                
+                const randomIndex = Math.floor(Math.random() * feedbackAudio.length);
+                playAudio(feedbackAudio[randomIndex]);
+                
+                showConfetti();
+                showBunny();
+                
+                score += 10;
+                document.getElementById('userScore').textContent = score;
+                if (currentUser) {
+                    currentUser.score = score;
+                    const userIndex = users.findIndex(u => u.name === currentUser.name);
+                    if (userIndex !== -1) {
+                        users[userIndex] = currentUser;
+                        localStorage.setItem('hebrewGameUsers', JSON.stringify(users));
+                    }
+                }
+                
+                setTimeout(() => startActivity1(), 2000);
+            } else {
+                event.target.classList.add('wrong');
+                playAudio('nasu-shuv.mp3');
+                setTimeout(() => {
+                    event.target.classList.remove('wrong');
+                }, 500);
+            }
+        }
+
+        function startActivity2() {
+            const gameArea = document.getElementById('gameArea');
+            const currentWord = getNextWord();
+            
+            updateProgress();
+            
+            const correctNikud = currentWord.word;
+            const wrongOptions = generateWrongNikud(currentWord.plain);
+            const allOptions = shuffleArray([correctNikud, ...wrongOptions]);
+            
+            gameArea.innerHTML = `
+                <div class="image-container" style="font-size: 8em;">
+                    ${currentWord.img}
+                </div>
+                <div class="options">
+                    ${allOptions.map(opt => `
+                        <button class="option-btn" onclick="checkAnswer2('${opt}', '${correctNikud}', '${currentWord.audio}')">
+                            ${opt}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function checkAnswer2(selected, correct, audioFile) {
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            if (selected === correct) {
+                buttons.forEach(btn => btn.disabled = true);
+                event.target.classList.add('correct');
+                
+                const randomIndex = Math.floor(Math.random() * feedbackAudio.length);
+                playAudio(feedbackAudio[randomIndex]);
+                
+                showConfetti();
+                showBunny();
+                
+                score += 10;
+                document.getElementById('userScore').textContent = score;
+                if (currentUser) {
+                    currentUser.score = score;
+                    const userIndex = users.findIndex(u => u.name === currentUser.name);
+                    if (userIndex !== -1) {
+                        users[userIndex] = currentUser;
+                        localStorage.setItem('hebrewGameUsers', JSON.stringify(users));
+                    }
+                }
+                
+                setTimeout(() => startActivity2(), 2000);
+            } else {
+                event.target.classList.add('wrong');
+                playAudio('nasu-shuv.mp3');
+                setTimeout(() => {
+                    event.target.classList.remove('wrong');
+                }, 500);
+            }
+        }
+
+        function startActivity3() {
+            const gameArea = document.getElementById('gameArea');
+            const currentWord = getNextWord();
+            
+            updateProgress();
+            
+            const letters = currentWord.plain.split('');
+            const shuffledLetters = shuffleArray([...letters]);
+            
+            gameArea.innerHTML = `
+                <div class="image-container" style="font-size: 8em;">
+                    ${currentWord.img}
+                </div>
+                <div class="word-display">${currentWord.word}</div>
+                <div class="letters-container" id="letterBoxes">
+                    ${letters.map((_, i) => `<div class="letter-box" data-index="${i}"></div>`).join('')}
+                </div>
+                <div class="draggable-letters" id="draggableLetters">
+                    ${shuffledLetters.map((letter, i) => `
+                        <button class="letter-btn" data-letter="${letter}" data-id="${i}" onclick="placeLetter(this, '${currentWord.plain}', '${currentWord.audio}')">
+                            ${letter}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            
+            window.currentLetterIndex = 0;
+        }
+
+        function placeLetter(btn, correctWord, audioFile) {
+            if (btn.classList.contains('used')) return;
+            
+            const letter = btn.dataset.letter;
+            const boxes = document.querySelectorAll('.letter-box');
+            const currentBox = boxes[window.currentLetterIndex];
+            
+            if (!currentBox) return;
+            
+            currentBox.textContent = letter;
+            currentBox.classList.add('filled');
+            btn.classList.add('used');
+            
+            window.currentLetterIndex++;
+            
+            if (window.currentLetterIndex >= correctWord.length) {
+                setTimeout(() => {
+                    const userWord = Array.from(boxes).map(box => box.textContent).join('');
+                    if (userWord === correctWord) {
+                        const randomIndex = Math.floor(Math.random() * feedbackAudio.length);
+                        playAudio(feedbackAudio[randomIndex]);
+                        showConfetti();
+                        showBunny();
+                        
+                        score += 10;
+                        document.getElementById('userScore').textContent = score;
+                        if (currentUser) {
+                            currentUser.score = score;
+                            const userIndex = users.findIndex(u => u.name === currentUser.name);
+                            if (userIndex !== -1) {
+                                users[userIndex] = currentUser;
+                                localStorage.setItem('hebrewGameUsers', JSON.stringify(users));
+                            }
+                        }
+                        
+                        setTimeout(() => startActivity3(), 2000);
+                    } else {
+                        playAudio('nasu-shuv.mp3');
+                        setTimeout(() => {
+                            // Reset everything - clear boxes and recreate buttons
+                            window.currentLetterIndex = 0;
+                            
+                            // Clear all letter boxes
+                            const boxes = document.querySelectorAll('.letter-box');
+                            boxes.forEach(box => {
+                                box.textContent = '';
+                                box.classList.remove('filled');
+                            });
+                            
+                            // Remove all old letter buttons completely
+                            const letterContainer = document.getElementById('draggableLetters');
+                            letterContainer.innerHTML = '';
+                            
+                            // Create new shuffled letters
+                            const letters = correctWord.split('');
+                            let shuffled;
+                            do {
+                                shuffled = [...letters].sort(() => Math.random() - 0.5);
+                            } while (shuffled.join('') === letters.join('') && letters.length > 1);
+                            
+                            // Create fresh button elements
+                            shuffled.forEach((letter, idx) => {
+                                const btn = document.createElement('button');
+                                btn.className = 'letter-btn';
+                                btn.textContent = letter;
+                                btn.dataset.letter = letter;
+                                btn.dataset.id = idx;
+                                btn.onclick = function() { 
+                                    placeLetter(this, correctWord, audioFile); 
+                                };
+                                letterContainer.appendChild(btn);
+                            });
+                        }, 1500);
+                    }
+                }, 300);
+            }
+        }
+
+        function startActivity4() {
+            const gameArea = document.getElementById('gameArea');
+            const currentWord = getNextWord();
+            
+            updateProgress();
+            
+            gameArea.innerHTML = `
+                <div class="word-display">${currentWord.word}</div>
+                <div class="sound-btn" onclick="playAudio('${currentWord.audio}')">
+                    🔊
+                </div>
+                <button onclick="startActivity4()">המילה הבאה ➡️</button>
+            `;
+        }
+
+        function updateProgress() {
+            const total = userData.currentRound.length;
+            const current = userData.roundIndex; // Already incremented by getNextWord
+            document.getElementById('progressText').textContent = `מילה ${current} מתוך ${total}`;
+        }
+
+        function playAudio(filename) {
+            try {
+                const audio = new Audio('./sounds/' + filename);
+                audio.play().catch(e => console.log('אודיו לא זמין'));
+            } catch (e) {
+                console.log('אודיו לא זמין');
+            }
+        }
+
+        function showConfetti() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = ['#ff69b4', '#ffd700', '#87ceeb', '#98fb98'][Math.floor(Math.random() * 4)];
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        function showBunny() {
+            const bunny = document.createElement('div');
+            bunny.className = 'bunny';
+            bunny.textContent = '🐰';
+            document.body.appendChild(bunny);
+            setTimeout(() => bunny.remove(), 1000);
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function getRandomWords(category, count, exclude) {
+            const words = wordDatabase[category].filter(w => w.word !== exclude);
+            const shuffled = shuffleArray(words);
+            return shuffled.slice(0, count);
+        }
+
+        function generateWrongNikud(plainWord) {
+            const nikudOptions = ['ַ', 'ָ', 'ֶ', 'ֵ', 'ִ', 'ֹ', 'ֻ', 'ּ'];
+            const wrong = [];
+            
+            for (let i = 0; i < 3; i++) {
+                let wrongWord = '';
+                for (const char of plainWord) {
+                    wrongWord += char + nikudOptions[Math.floor(Math.random() * nikudOptions.length)];
+                }
+                wrong.push(wrongWord);
+            }
+            
+            return wrong;
+        }
+        
+        // Load user list on page load
+        loadUserList();
+
+        // Activity 5: Nikud Learning
+        let currentNikudLesson = null;
+
+        function startActivity5() {
+            loadNikudLesson();
+        }
+
+        async function loadNikudLesson() {
+            // Pick a random letter (each letter has 4 nikud variants)
+            const letters = ['ב', 'ג', 'ד', 'כ', 'ל', 'מ', 'נ', 'ס', 'פ', 'ר', 'ש', 'ת'];
+            const randomLetter = letters[Math.floor(Math.random() * letters.length)];
+            
+            // Get all 4 nikud variants for this letter
+            const letterOptions = nikudData.filter(item => item.example.includes(randomLetter));
+            
+            // Pick one as the correct answer
+            currentNikudLesson = letterOptions[Math.floor(Math.random() * letterOptions.length)];
+            
+            const options = document.getElementById('nikudLessonOptions');
+            options.innerHTML = '';
+            
+            // Shuffle the 4 options
+            const shuffled = shuffleArray([...letterOptions]);
+            
+            shuffled.forEach(nikud => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn nikud-lesson';
+                btn.innerHTML = `
+                    <div class="nikud-name">${nikud.name}</div>
+                    <div class="nikud-example">${nikud.example}</div>
+                `;
+                btn.onclick = () => checkNikudLesson(nikud);
+                options.appendChild(btn);
+            });
+            
+            // Play the sound after a short delay
+            await new Promise(r => setTimeout(r, 500));
+            playAudio(currentNikudLesson.audio);
+        }
+
+        function playCurrentNikudLesson() {
+            if (currentNikudLesson) {
+                playAudio(currentNikudLesson.audio);
+            }
+        }
+
+        async function checkNikudLesson(selected) {
+            const buttons = document.querySelectorAll('#nikudLessonOptions .option-btn');
+            
+            if (selected.name === currentNikudLesson.name) {
+                buttons.forEach(btn => btn.disabled = true);
+                event.target.classList.add('correct');
+                
+                const randomIndex = Math.floor(Math.random() * feedbackAudio.length);
+                playAudio(feedbackAudio[randomIndex]);
+                
+                showConfetti();
+                showBunny();
+                
+                score += 10;
+                document.getElementById('userScore').textContent = score;
+                if (currentUser) {
+                    currentUser.score = score;
+                    const userIndex = users.findIndex(u => u.name === currentUser.name);
+                    if (userIndex !== -1) {
+                        users[userIndex] = currentUser;
+                        localStorage.setItem('hebrewGameUsers', JSON.stringify(users));
+                    }
+                }
+                
+                await new Promise(r => setTimeout(r, 2000));
+                loadNikudLesson();
+            } else {
+                event.target.classList.add('wrong');
+                playAudio('nasu-shuv.mp3');
+                setTimeout(() => {
+                    event.target.classList.remove('wrong');
+                }, 500);
+            }
+        }
+    </script>
+</body>
+</html>
